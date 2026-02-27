@@ -25,6 +25,13 @@
       modules = [
         "break"
         {
+          type = "title";
+          format = "{2}";
+          key = "Host";
+          keyColor = "31";
+        }
+        "break"
+        {
           type = "os";
           key = "OS - NixOS";
           keyColor = "31";

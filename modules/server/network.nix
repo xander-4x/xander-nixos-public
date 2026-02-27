@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   # Server network configuration
   # Note: hostname is set in modules/core/system.nix
 
@@ -8,7 +9,10 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [22];
+      allowedTCPPorts = [
+        47821 # SSH
+        8443
+      ];
     };
   };
 }

@@ -1,4 +1,5 @@
-{username, ...}: {
+{ username, ... }:
+{
   programs.hyprlock = {
     enable = true;
     settings = {
@@ -11,7 +12,7 @@
       };
       background = [
         {
-          path = "/home/${username}/Pictures/Wallpapers/sw-commando-0.jpg";
+          path = "/home/${username}/Pictures/Wallpapers/home.jpg";
           blur_passes = 3;
           blur_size = 8;
         }

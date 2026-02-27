@@ -57,11 +57,17 @@ in {
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStart = "${pkgs.xorg.xrandr}/bin/xrandr --auto";
+        ExecStart = "${pkgs.xrandr}/bin/xrandr --auto";
         User = "root";
       };
     };
 
     programs.hyprland.enable = mkDefault true;
+
+    # GPU symlinks for easier device identification
+    services.udev.extraRules = ''
+      KERNEL=="card[0-9]*", SUBSYSTEM=="drm", DRIVERS=="nvidia", SYMLINK+="dri/card-nvidia"
+      KERNEL=="card[0-9]*", SUBSYSTEM=="drm", DRIVERS=="amdgpu", SYMLINK+="dri/card-amd"
+    '';
   };
 }

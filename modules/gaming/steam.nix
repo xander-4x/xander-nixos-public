@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, config, ...}: {
   programs = {
     steam = {
       enable = true;
@@ -24,6 +24,7 @@
     ENABLE_VK_LAYER_VALVE_steam_fossilize = "0";
     DXVK_LOG_LEVEL = "warn";
     WINEDEBUG = "-all";
+    TZ = config.time.timeZone;
   };
 
   # For NVIDIA gaming, use: nvidia-offload steam

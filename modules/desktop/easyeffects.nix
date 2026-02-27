@@ -15,9 +15,13 @@
     ];
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.easyeffects}/bin/easyeffects --gapplication-service";
-      Restart = "on-failure";
+      ExecStart = "${pkgs.easyeffects}/bin/easyeffects --hide-window";
+      Restart = "always";
       RestartSec = 3;
+    };
+    unitConfig = {
+      StartLimitBurst = 5;
+      StartLimitIntervalSec = 300;
     };
   };
 }

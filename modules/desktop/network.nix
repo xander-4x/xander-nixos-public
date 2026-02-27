@@ -2,17 +2,13 @@
   pkgs,
   options,
   ...
-}:
-{
+}: {
   # Desktop network configuration
   # Note: hostname is set in modules/core/system.nix
 
   networking = {
     networkmanager.enable = true;
-    timeServers = options.networking.timeServers.default ++ [ "pool.ntp.org" ];
-    extraHosts = ''
-      x.x.x.x localdomain.test
-    '';
+    timeServers = options.networking.timeServers.default ++ ["pool.ntp.org"];
     firewall = {
       enable = true;
       allowedTCPPorts = [
@@ -32,5 +28,5 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [ networkmanagerapplet ];
+  environment.systemPackages = with pkgs; [networkmanagerapplet];
 }

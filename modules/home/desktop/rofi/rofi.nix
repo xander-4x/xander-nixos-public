@@ -60,7 +60,7 @@
           "imagebox" = {
             padding = mkLiteral "20px";
             background-color = mkLiteral "transparent";
-            background-image = mkLiteral ''url("~/Pictures/Wallpapers/sw-vader-0.jpg", height)'';
+            background-image = mkLiteral ''url("~/Pictures/Wallpapers/home.jpg", height)'';
             orientation = mkLiteral "vertical";
             children = map mkLiteral [
               "inputbar"

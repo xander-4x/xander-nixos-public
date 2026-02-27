@@ -8,7 +8,15 @@
     (import ../../../../hosts/${host}/variables.nix)
     keyboardLayout
     extraMonitorSettings
+    shellChoice
     ;
+
+  # Shell-specific startup commands (DMS uses systemd service instead)
+  shellExecOnce = if shellChoice == "dms" then [
+  ] else [
+    "killall -q waybar;sleep .5 && waybar"
+    "killall -q swaync;sleep .5 && swaync"
+  ];
 in {
   home.packages = with pkgs; [
     swww
@@ -43,6 +51,14 @@ in {
     xwayland = {
       enable = true;
     };
+
+    # Source DMS-generated configs (when using DMS)
+    extraConfig = if shellChoice == "dms" then ''
+      source = ~/.config/hypr/dms/colors.conf
+      source = ~/.config/hypr/dms/cursor.conf
+      source = ~/.config/hypr/dms/outputs.conf
+    '' else "";
+
     settings = {
       "$modifier" = "SUPER";
 
@@ -50,11 +66,9 @@ in {
         "dbus-update-activation-environment --all --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "systemctl --user start hyprpolkitagent"
-        "killall -q waybar;sleep .5 && waybar"
-        "killall -q swaync;sleep .5 && swaync"
         "nm-applet --indicator"
         "pypr &"
-      ];
+      ] ++ shellExecOnce;
 
       input = {
         kb_layout = "${keyboardLayout}";
@@ -84,9 +98,12 @@ in {
         gaps_out = 8;
         border_size = 2;
         resize_on_border = true;
+      } // (if shellChoice == "dms" then {
+        # Border colors managed by DMS via colors.conf
+      } else {
         "col.active_border" = "rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base0C}) 45deg";
         "col.inactive_border" = "rgb(${config.lib.stylix.colors.base01})";
-      };
+      });
 
       misc = {
         layers_hog_keyboard_focus = true;

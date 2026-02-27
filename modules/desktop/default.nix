@@ -5,7 +5,13 @@
   ...
 }:
 let
-  inherit (import ../../hosts/${host}/variables.nix) thunarEnable printEnable;
+  inherit (import ../../hosts/${host}/variables.nix) thunarEnable printEnable shellChoice;
+
+  # Stylix imports (disabled when using DMS - it handles theming via matugen)
+  stylixImports = if shellChoice == "dms" then [] else [
+    ./stylix.nix
+    inputs.stylix.nixosModules.stylix
+  ];
 in
 {
   imports = [
@@ -22,14 +28,14 @@ in
     ./flatpak.nix
     ./fonts.nix
     ./greetd.nix
-    ./stylix.nix
     ./easyeffects.nix
     ./pwvucontrol.nix
     ./ratbag.nix
     ./rustdesk.nix
+    ./anydesk.nix
     ./swaylock.nix
-    inputs.stylix.nixosModules.stylix
   ]
+  ++ stylixImports
   ++ (if thunarEnable then [ ./thunar.nix ] else [ ])
   ++ (if printEnable then [ ./printing.nix ] else [ ]);
 }

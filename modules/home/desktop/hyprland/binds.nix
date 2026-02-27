@@ -1,20 +1,28 @@
-{host, ...}: let
-  inherit
-    (import ../../../../hosts/${host}/variables.nix)
-    browser
+{ host, ... }:
+let
+  inherit (import ../../../../hosts/${host}/variables.nix)
+    browserExec
     terminal
+    shellChoice
     ;
-in {
+
+  # Shell-specific keybindings
+  # DMS IPC: use qs with path derived from dms binary location
+  dmsIpc = "qs ipc -p $(dirname $(dirname $(readlink -f $(which dms))))/share/quickshell/dms call";
+  launcherCmd = if shellChoice == "dms" then "${dmsIpc} spotlight toggle" else "rofi-launcher";
+  notifCmd = if shellChoice == "dms" then "${dmsIpc} notifications toggle" else "swaync-client -rs";
+  lockCmd = if shellChoice == "dms" then "${dmsIpc} lock lock" else "hyprlock";
+in
+{
   wayland.windowManager.hyprland.settings = {
     bind = [
       "$modifier,T,exec,${terminal}"
       "$modifier,K,exec,list-keybinds"
-      "$modifier,Return,exec,rofi-launcher"
+      "$modifier,Return,exec,${launcherCmd}"
       "$modifier SHIFT,W,exec,web-search"
       "$modifier ALT,W,exec,wallsetter"
-      "$modifier SHIFT,N,exec,swaync-client -rs"
-      "$modifier,W,exec,${browser}"
-      "$modifier,Y,exec,kitty -e yazi"
+      "$modifier SHIFT,N,exec,${notifCmd}"
+      "$modifier,W,exec,${browserExec}"
       "$modifier,E,exec,thunar"
       "$modifier SHIFT,S,exec,screenshootin"
       "$modifier,C,exec,hyprpicker -a"
@@ -91,8 +99,7 @@ in {
       ",XF86MonBrightnessDown,exec,brightnessctl set 5%-"
       ",XF86MonBrightnessUp,exec,brightnessctl set +5%"
       ",XF86Calculator, exec, qalculate"
-      "CONTROL,SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next"
-      "$modifier,Delete,exec,hyprlock"
+      "$modifier,Delete,exec,${lockCmd}"
     ];
 
     bindm = [

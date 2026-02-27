@@ -5,7 +5,8 @@
       noto-fonts-cjk-sans
       nerd-fonts.jetbrains-mono
       font-awesome
-      symbola
+      # symbola # TODO: upstream source unavailable (archive.org 503)
+      noto-fonts
       material-icons
       fira-code
       fira-code-symbols

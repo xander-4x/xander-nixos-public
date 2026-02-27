@@ -17,14 +17,6 @@ let
       icon = "${homeDir}/Applications/YouGile.png";
       categories = [ "Utility" ];
     }
-    {
-      name = "LibreWolf";
-      path = "${homeDir}/Applications/LibreWolf.AppImage";
-      icon = "${homeDir}/Applications/librewolf.png";
-      categories = [ "Utility" ];
-
-    }
-
     # {
     #   name = "myapp";
     #   path = "/home/you/Applications/myapp.AppImage";

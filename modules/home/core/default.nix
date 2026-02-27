@@ -1,9 +1,10 @@
 {...}: {
   imports = [
     ./fastfetch
+    ./nixvim
     ./zsh
     ./yazi
-    ./amfora.nix
+    # ./amfora.nix
     ./bash.nix
     ./bashrc-personal.nix
     ./bat.nix
@@ -12,7 +13,6 @@
     ./git.nix
     ./htop.nix
     ./starship.nix
-    ./xdg.nix
     ./zoxide.nix
   ];
 }

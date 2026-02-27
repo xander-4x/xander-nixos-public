@@ -1,14 +1,18 @@
 {host, ...}: let
-  inherit (import ../../../../hosts/${host}/variables.nix) animChoice;
+  inherit (import ../../../../hosts/${host}/variables.nix) animChoice shellChoice;
+
+  # DMS replaces hypridle, hyprlock, and swww management
+  dmsReplacedImports = if shellChoice == "dms" then [] else [
+    ./hypridle.nix
+    ./hyprlock.nix
+    ./swww.nix
+  ];
 in {
   imports = [
     animChoice
     ./binds.nix
-    ./hypridle.nix
     ./hyprland.nix
-    ./hyprlock.nix
     # ./pyprland.nix
     ./windowrules.nix
-    ./swww.nix
-  ];
+  ] ++ dmsReplacedImports;
 }

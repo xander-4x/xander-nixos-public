@@ -7,6 +7,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    dgop = {
+      url = "github:AvengeMedia/dgop";
+      flake = false;
+    };
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,27 +20,30 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      ...
-    }@inputs:
-    let
-      system = "x86_64-linux";
+  outputs = {
+    self,
+    nixpkgs,
+    ...
+  } @ inputs: let
+    system = "x86_64-linux";
 
-      mkHost =
-        host: username:
-        nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs username host; };
-          modules = [ ./hosts/${host} ];
-        };
-    in
-    {
-      nixosConfigurations = {
-        "desktop" = mkHost "desktop-host" "desktop-user";
-        "server" = mkHost "server-host" "server-user";
-      };
+    overlay = final: prev: {
+      dgop = final.callPackage ./pkgs/dgop.nix { src = inputs.dgop; };
     };
+
+    mkHost = host: username:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {inherit inputs username host;};
+        modules = [
+          { nixpkgs.overlays = [ overlay ]; }
+          ./hosts/${host}
+        ];
+      };
+  in {
+    nixosConfigurations = {
+      "desktop" = mkHost "desktop" "nixuser";
+      "server" = mkHost "server" "nixuser";
+    };
+  };
 }

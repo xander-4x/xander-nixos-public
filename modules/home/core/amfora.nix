@@ -2,7 +2,7 @@ _: {
   home.file = {
     ".config/amfora/config.toml".text = ''
       [a-general]
-      home = "gemini://gem.zaney.org"
+      home = ""
       color = true
       ansi = true
       bullets = true

@@ -4,6 +4,7 @@
     extraMonitorSettings
     nvidiaDRM
     amdDRM
+    shellChoice
     ;
 in {
   wayland.windowManager.hyprland = {
@@ -100,8 +101,9 @@ in {
         "EDITOR,nvim"
       ];
     };
-    extraConfig = "
-    ${extraMonitorSettings}
-    ";
+    # Monitor settings: use DMS outputs.conf or manual settings
+    extraConfig = if shellChoice == "dms" then "" else ''
+      ${extraMonitorSettings}
+    '';
   };
 }

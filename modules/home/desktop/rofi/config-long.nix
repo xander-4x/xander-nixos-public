@@ -13,7 +13,7 @@
     inputbar {
       padding: 75px 40px;
       background-color: transparent;
-      background-image: url("~/Pictures/Wallpapers/sw-vader-0.jpg", width);
+      background-image: url("~/Pictures/Wallpapers/home.jpg", width);
       text-color: @foreground;
       children: [ "textbox-prompt-colon", "entry" ];
     }

@@ -64,6 +64,8 @@ rules = [
 	{ name = "*/", use = [ "edit", "open", "reveal" ] },
 	# Text
 	{ mime = "text/*", use = [ "edit", "reveal" ] },
+	# Nix
+	{ name = "*.nix", use = [ "edit", "reveal" ] },
 	# Image
 	{ mime = "image/*", use = [ "open", "reveal" ] },
 	# Media
@@ -88,10 +90,6 @@ image_bound      = [ 0, 0 ]
 suppress_preload = false
 
 [plugin]
-fetchers = [
-	# Mimetype
-	{ id = "mime", name = "*", run = "mime", prio = "high" },
-]
 spotters = [
 	{ name = "*/", run = "folder" },
 	# Code
@@ -219,6 +217,13 @@ sort_by      	 = "none"
 sort_sensitive = false
 sort_reverse 	 = false
 sort_translit  = false
+
+[[plugin.prepend_fetchers]]
+id   = "mime"
+name = "*"
+run  = "mime"
+prio = "high"
+
 [[plugin.prepend_fetchers]]
 id   = "git"
 name = "*"

@@ -1,24 +1,37 @@
 {host, ...}: let
-  inherit (import ../../../hosts/${host}/variables.nix) waybarChoice;
+  inherit (import ../../../hosts/${host}/variables.nix) shellChoice waybarChoice;
+
+  # Shell-specific imports based on shellChoice
+  shellImports = if shellChoice == "dms" then [
+    ./dms.nix
+    # rofi, wlogout, stylix not needed - DMS has built-in alternatives
+  ] else [
+    waybarChoice
+    ./swaync.nix
+    ./rofi
+    ./wlogout
+    ./stylix.nix
+  ];
 in {
+  # GNOME Keyring SSH socket (only for desktop)
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "/run/user/1000/gcr/ssh";
+  };
+
   imports = [
     ./dev
     ./hyprland
-    ./rofi
     ./scripts
-    ./wlogout
-    waybarChoice
     ./appimages.nix
     ./cava.nix
     # ./ghostty.nix
     ./gtk.nix
     # ./kitty.nix
     ./qt.nix
-    ./stylix.nix
     ./swappy.nix
-    ./swaync.nix
     # ./upwork.nix
     ./virtmanager.nix
     ./wezterm.nix
-  ];
+    ./xdg.nix
+  ] ++ shellImports;
 }

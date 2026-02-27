@@ -9,6 +9,7 @@ A modular NixOS configuration with clear separation between core system modules,
 
 - **Modular architecture** - Easy to create desktop or server configurations
 - **Hyprland** - Wayland compositor with custom animations and keybindings
+- **DankMaterialShell (DMS)** - Integrated desktop shell replacing waybar, rofi, swaync, hyprlock, and hypridle
 - **Stylix** - Automatic system-wide theming based on wallpaper
 - **Home Manager** - Declarative user environment management
 - **NixVim** - Fully configured Neovim with LSP, completion, and plugins
@@ -16,10 +17,10 @@ A modular NixOS configuration with clear separation between core system modules,
 
 ## Hosts
 
-| Host           | Type    | Description                   |
-| -------------- | ------- | ----------------------------- |
-| `desktop-host` | Desktop | Desktop stattion              |
-| `server-host`  | Server  | Remote dedicated/cloud server |
+| Host | Type | Description |
+|------|------|-------------|
+| `desktop` | Desktop | Laptop with AMD+NVIDIA GPUs |
+| `server` | Server | Headless server with AMD CPU |
 
 ## Project Structure
 
@@ -29,7 +30,7 @@ A modular NixOS configuration with clear separation between core system modules,
 ├── wallpapers/               # Wallpapers for Stylix theming
 │
 ├── hosts/
-│   ├── desktop-host/             # Desktop workstation
+│   ├── desktop/              # Desktop workstation
 │   │   ├── default.nix       # Host configuration (imports modules)
 │   │   ├── hardware.nix      # Hardware-specific settings
 │   │   ├── variables.nix     # Host variables (customize here!)
@@ -37,7 +38,7 @@ A modular NixOS configuration with clear separation between core system modules,
 │   │   ├── host-packages.nix # System packages
 │   │   └── zram.nix          # Swap configuration
 │   │
-│   └── server-host/          # Server
+│   └── server/               # Server
 │       ├── default.nix       # Host configuration
 │       ├── hardware.nix      # Hardware-specific settings
 │       ├── variables.nix     # Host variables
@@ -74,12 +75,15 @@ A modular NixOS configuration with clear separation between core system modules,
     │
     ├── gaming/               # Gaming (Steam, Lutris, OBS)
     │
-    ├── virtualisation/       # Podman, libvirt, Docker compat
+    ├── virtualisation/       # Container and VM support
+    │   ├── podman.nix        # Podman + Docker compat (server & desktop)
+    │   └── libvirt.nix       # libvirtd, virt-manager (desktop only)
     │
     ├── drivers/              # GPU drivers (NVIDIA, AMD, Intel)
     │
     └── home/                 # Home-manager modules
         ├── core/             # CLI tools (works on servers too)
+        │   ├── nixvim/       # Neovim configuration
         │   ├── zsh/          # Shell configuration
         │   ├── git.nix       # Git config
         │   ├── yazi/         # TUI file manager
@@ -87,9 +91,10 @@ A modular NixOS configuration with clear separation between core system modules,
         │
         └── desktop/          # GUI applications
             ├── hyprland/     # Window manager
-            ├── waybar/       # Status bar
-            ├── rofi/         # Application launcher
-            ├── dev/          # Development tools (NixVim, VSCodium)
+            ├── dms.nix       # DankMaterialShell (replaces waybar, rofi, swaync, hyprlock, hypridle)
+            ├── waybar/       # Status bar (used when shellChoice = "waybar")
+            ├── rofi/         # Application launcher (used when shellChoice = "waybar")
+            ├── dev/          # Development tools (VSCodium, cloud-tools)
             └── ...
 ```
 
@@ -204,9 +209,14 @@ mkdir -p hosts/myhost
     monitor=,preferred,auto,1
   '';
 
+  # Desktop shell choice
+  # "dms"    = DankMaterialShell (replaces waybar, swaync, hyprlock, hypridle)
+  # "waybar" = traditional waybar + swaync setup
+  shellChoice = "dms";
+
   # Theming
   stylixImage = ../../wallpapers/your-wallpaper.jpg;
-  waybarChoice = ../../modules/home/desktop/waybar/waybar-curved.nix;
+  waybarChoice = ../../modules/home/desktop/waybar/waybar-curved.nix; # only when shellChoice = "waybar"
   animChoice = ../../modules/home/desktop/hyprland/animations-end4.nix;
 
   # Optional features
@@ -294,7 +304,8 @@ For a server without GUI, use `modules/server` instead of `modules/desktop`:
     ../../modules/server
 
     # Optional:
-    ../../modules/virtualisation  # For Docker/VMs
+    ../../modules/virtualisation/podman.nix  # For containers (no VMs)
+    # ../../modules/virtualisation            # For containers + VMs (includes libvirt)
   ];
 
   system.stateVersion = "25.11";
@@ -361,18 +372,28 @@ Deploy to server from your local machine:
 nixos-rebuild switch --flake .#myserver --target-host root@myserver
 ```
 
+### Enable rootless Podman
+
+After first deployment, enable the user podman socket:
+
+```bash
+systemctl --user enable --now podman.socket
+```
+
 ## Module Overview
 
-| Module                   | Type    | Description                                                     |
-| ------------------------ | ------- | --------------------------------------------------------------- |
-| `modules/core`           | Shared  | Base system: hostname, timezone, locale, nix settings, security |
-| `modules/desktop`        | Desktop | Boot, network, hardware, services, audio, bluetooth, theming    |
-| `modules/server`         | Server  | Minimal boot, network (SSH), services (fstrim, tailscale)       |
-| `modules/gaming`         | Desktop | Steam, Lutris, game streaming                                   |
-| `modules/virtualisation` | Both    | Podman, libvirt, Docker compatibility                           |
-| `modules/drivers`        | Desktop | NVIDIA, AMD, Intel GPU drivers                                  |
-| `modules/home/core`      | Both    | CLI tools: zsh, git, yazi, btop, starship                       |
-| `modules/home/desktop`   | Desktop | GUI: Hyprland, waybar, rofi, NixVim, terminals                  |
+| Module | Type | Description |
+|--------|------|-------------|
+| `modules/core` | Shared | Base system: hostname, timezone, locale, nix settings, security |
+| `modules/desktop` | Desktop | Boot, network, hardware, services, audio, bluetooth, theming |
+| `modules/server` | Server | Minimal boot, network (SSH), services (fstrim, tailscale), zsh |
+| `modules/gaming` | Desktop | Steam, Lutris, game streaming |
+| `modules/virtualisation` | Desktop | Full: Podman + libvirt + virt-manager |
+| `modules/virtualisation/podman.nix` | Both | Podman with Docker compatibility (rootless) |
+| `modules/virtualisation/libvirt.nix` | Desktop | libvirtd, virt-manager, SPICE |
+| `modules/drivers` | Desktop | NVIDIA, AMD, Intel GPU drivers |
+| `modules/home/core` | Both | CLI tools: zsh, git, yazi, btop, starship, NixVim |
+| `modules/home/desktop` | Desktop | GUI: Hyprland, DMS or waybar/rofi/swaync, terminals, xdg |
 
 ## Key Files to Customize
 
@@ -393,6 +414,8 @@ nixos-rebuild switch --flake .#myserver --target-host root@myserver
 | [home-manager](https://github.com/nix-community/home-manager) | User environment management    |
 | [stylix](https://github.com/danth/stylix)                     | System-wide theming            |
 | [nixvim](https://github.com/nix-community/nixvim)             | Neovim configuration framework |
+| [nvf](https://github.com/notashelf/nvf)                       | Alternative Neovim framework   |
+| [dgop](https://github.com/AvengeMedia/dgop)                   | Custom package overlay         |
 
 ## License
 
