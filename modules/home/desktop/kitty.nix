@@ -1,16 +1,19 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   programs.kitty = {
     enable = true;
     package = pkgs.kitty;
     settings = {
       font_size = 10;
       wheel_scroll_min_lines = 1;
+      wheel_scroll_multiplier = 15.0;
       window_padding_width = 4;
       confirm_os_window_close = 0;
       scrollback_lines = 10000;
       enable_audio_bell = false;
       mouse_hide_wait = 60;
       cursor_trail = 1;
+      background_opacity = lib.mkForce "0.85";
+      dynamic_background_opacity = true;
       tab_fade = 1;
       active_tab_font_style = "bold";
       inactive_tab_font_style = "bold";

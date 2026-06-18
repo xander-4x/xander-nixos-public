@@ -5,11 +5,11 @@
   ...
 }: let
   inherit
-    (import ../../../../hosts/${host}/variables.nix)
+    (import ../../../hosts/${host}/variables.nix)
     stylixImage
     ;
 in {
-  home.packages = [ pkgs.swww ];
+  home.packages = [ pkgs.awww ];
 
   systemd.user.services.swww-daemon = {
     Unit = {
@@ -17,7 +17,7 @@ in {
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
-      ExecStart = "${pkgs.swww}/bin/swww-daemon";
+      ExecStart = "${pkgs.awww}/bin/awww-daemon";
       Restart = "on-failure";
       RestartSec = 2;
     };
@@ -34,7 +34,7 @@ in {
     };
     Service = {
       Type = "oneshot";
-      ExecStart = "${pkgs.swww}/bin/swww img ${stylixImage}";
+      ExecStart = "${pkgs.awww}/bin/awww img ${stylixImage}";
     };
     Install = {
       WantedBy = [ "graphical-session.target" ];

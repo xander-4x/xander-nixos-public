@@ -1,12 +1,13 @@
-{...}: let
-  inherit (import ./variables.nix) nvidiaID amdgpuID;
-in {
+{...}: {
   imports = [
     # Host-specific
     ./hardware.nix
     ./host-packages.nix
+    ./kernel-tuning.nix
+    ./thinkpad.nix
     ./user.nix
     ./zram.nix
+    ./hibernate.nix
 
     # Core system modules
     ../../modules/core
@@ -24,15 +25,7 @@ in {
     ../../modules/drivers
   ];
 
-  # GPU drivers
-  drivers.amdgpu.enable = true;
-  drivers.nvidia.enable = true;
-  drivers.nvidia-prime = {
-    enable = true;
-    amdBusID = "${amdgpuID}";
-    nvidiaBusID = "${nvidiaID}";
-  };
-  drivers.intel.enable = false;
+  drivers.intel.enable = true;
   vm.guest-services.enable = false;
 
   system.stateVersion = "23.11";

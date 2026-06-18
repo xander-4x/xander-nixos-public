@@ -8,32 +8,31 @@ in {
   };
 
   config = mkIf cfg.enable {
-    services.xserver.videoDrivers = [ "nvidia" "amdgpu" ];
+    services.xserver.videoDrivers = [ "amdgpu" "nvidia" ];
 
     hardware.nvidia = {
       modesetting.enable = true;
 
-      powerManagement.enable = true;   # Preserve VRAM on suspend, RTD3 works on Ada Lovelace without finegrained
-      powerManagement.finegrained = false;  # Disabled: causes crashes with external monitors (NVIDIA bug 5034343)
+      powerManagement.enable = true;
+      # RTD3 — dGPU off when no process holds it (only spun up via nvidia-offload).
+      # Safe without external monitors (NVIDIA bug 5034343 only triggers with HDMI/DP on dGPU).
+      powerManagement.finegrained = true;
 
       open = false;
       nvidiaSettings = true;
 
       package = config.boot.kernelPackages.nvidiaPackages.stable;
-      forceFullCompositionPipeline = true;
     };
 
-    # Kernel parameters for NVIDIA suspend/resume and HDMI
+    # Generic NVIDIA kernel params. Host-specific quirks (PCIe ASPM, IOMMU,
+    # AMD S0ix interop, etc.) live in the host's own kernel-tuning module.
     boot.kernelParams = [
       "nvidia-drm.modeset=1"
       "nvidia-drm.fbdev=1"
       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-      "nvidia.NVreg_EnableS0ixPowerManagement=0"  # Disable S0ix - problematic on AMD
       "nvidia.NVreg_TemporaryFilePath=/var/tmp"
-      "pcie_aspm=off"  # Disable PCIe ASPM - can cause Data Fabric Sync Flood on AMD
     ];
 
-    # Workaround for NVIDIA 580.x black screen on resume
     boot.extraModprobeConfig = ''
       options nvidia_modeset vblank_sem_control=0
     '';

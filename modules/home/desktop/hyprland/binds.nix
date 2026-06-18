@@ -30,7 +30,7 @@ in
       "$modifier,M,exec,/run/current-system/sw/bin/pwvucontrol"
       "$modifier,Q,killactive,"
       "$modifier,P,pseudo,"
-      "$modifier SHIFT,I,togglesplit,"
+      "$modifier SHIFT,I,layoutmsg,togglesplit"
       "$modifier,F,fullscreen,2"
       "$modifier,R,fullscreen,1"
       "$modifier SHIFT,F,togglefloating,"
@@ -100,6 +100,9 @@ in
       ",XF86MonBrightnessUp,exec,brightnessctl set +5%"
       ",XF86Calculator, exec, qalculate"
       "$modifier,Delete,exec,${lockCmd}"
+      "CTRL ALT,V,exec,cliphist list | rofi -dmenu -p 'Clipboard' | cliphist decode | wl-copy"
+      "CTRL ALT,X,exec,cliphist wipe"
+      ",XF86PowerOff,exec,sleep 0.1 && wlogout"
     ];
 
     bindm = [

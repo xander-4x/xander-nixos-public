@@ -23,7 +23,6 @@
 
       # Completion
       ./plugins/cmp/cmp.nix
-      ./plugins/cmp/cmp-copilot.nix
       ./plugins/cmp/lspkind.nix
       ./plugins/cmp/autopairs.nix
       ./plugins/cmp/schemastore.nix
@@ -38,22 +37,28 @@
       ./plugins/editor/illuminate.nix
       ./plugins/editor/indent-blankline.nix
       ./plugins/editor/todo-comments.nix
-      ./plugins/editor/copilot-chat.nix
       ./plugins/editor/navic.nix
+      ./plugins/editor/rainbow-delimiters.nix
+      ./plugins/editor/refactoring.nix
+      ./plugins/editor/go.nix
 
       # UI plugins
       ./plugins/ui/bufferline.nix
-      # ./plugins/ui/lualine.nix
-      ./plugins/ui/startup.nix
+      ./plugins/ui/lualine.nix
+      ./plugins/ui/alpha.nix
+      ./plugins/ui/trouble.nix
 
       # LSP and formatting
       ./plugins/lsp/lsp.nix
       ./plugins/lsp/conform.nix
       ./plugins/lsp/fidget.nix
+      ./plugins/lsp/dap.nix
+      ./plugins/lsp/typescript-tools.nix
 
       # Git
       ./plugins/git/lazygit.nix
       ./plugins/git/gitsigns.nix
+      ./plugins/git/diffview.nix
 
       # Utils
       ./plugins/utils/telescope.nix
@@ -65,6 +70,9 @@
       ./plugins/utils/toggleterm.nix
       ./plugins/utils/web-devicons.nix
       ./plugins/utils/sshfs.nix
+      ./plugins/utils/grug-far.nix
+      ./plugins/utils/dadbod.nix
+      ./plugins/utils/kulala.nix
     ];
   };
 }

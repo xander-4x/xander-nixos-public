@@ -5,9 +5,7 @@
 
   # Hyprland Settings
   extraMonitorSettings = "
-    monitor=DP-1,2560x1440@180,-2560x0,1
-    monitor=eDP-1,1920x1080@144,0x0,1
-    monitor=eDP-2,1920x1080@144,0x0,1
+    monitor=eDP-1,1920x1200@60,0x0,1
   ";
 
   # Waybar Settings
@@ -20,12 +18,11 @@
   keyboardLayout = "us,ru";
   consoleKeyMap = "us";
 
-  # For Nvidia Prime support
-  amdgpuID = "PCI:36:0:0";
-  nvidiaID = "PCI:1:0:0";
-
-  nvidiaDRM = "/dev/dri/card-nvidia";
-  amdDRM = "/dev/dri/card-amd";
+  # For Nvidia Prime support (uncomment to enable):
+  # amdgpuID = "PCI:36:0:0";
+  # nvidiaID = "PCI:1:0:0";
+  # nvidiaDRM = "/dev/dri/card-nvidia";
+  # amdDRM = "/dev/dri/card-amd";
 
   # Enable NFS
   enableNFS = true;
@@ -36,10 +33,14 @@
   # Set Stylix Image
   stylixImage = ../../wallpapers/new-york.jpg;
 
+  # Cursor Settings
+  cursorName = "Bibata-Modern-Ice";
+  cursorSize = 20;
+
   # Desktop shell choice
   # "dms" = DankMaterialShell (replaces waybar, swaync, hyprlock, hypridle)
   # "waybar" = traditional waybar + swaync setup
-  shellChoice = "dms";
+  shellChoice = "waybar";
 
   # Set Waybar (only used when shellChoice = "waybar")
   # Includes alternates such as waybar-simple.nix & waybar-ddubs.nix

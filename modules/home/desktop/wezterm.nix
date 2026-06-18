@@ -1,11 +1,12 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   programs.wezterm = {
     enable = true;
     package = pkgs.wezterm;
   };
   home.file."./.config/wezterm/wezterm.lua".text = ''
     -- Config from Drew @justaguylinux small mods
-   
+
      local wezterm = require("wezterm")
 
      local config = wezterm.config_builder()
@@ -34,9 +35,12 @@
      }
 
      config.window_background_opacity = 0.90
-     config.color_scheme = "nightfox"
+     config.color_scheme = "Catppuccin Macchiato"
      config.font_size = 11
-     config.font = wezterm.font("FiraCode", { weight = "Regular", italic = false })
+     config.font = wezterm.font_with_fallback({
+       { family = "Fira Code", weight = "Regular", italic = false },
+       { family = "JetBrainsMono Nerd Font Mono", weight = "Regular" },
+     })
 
      config.window_padding = {
        left = 10,

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   programs = {
     hyprland.enable = true;
@@ -14,16 +14,15 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [ "electron-39.8.10" ];
 
   environment.systemPackages = with pkgs; [
     p7zip
-    # audacity
-    asusctl
     bind # inet tools
-    bitwarden-desktop # Password manafer
+    bitwarden-desktop # Password manager
     brave # Brave Browser
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default # Zen Browser
     brightnessctl # For Screen Brightness Control
-    claude-code # claude cli
     cmatrix # Matrix Movie Effect In Terminal
     duf # Utility For Viewing Disk Usage In Terminal
     discord
@@ -37,17 +36,19 @@
     gimp3 # image manipulation program
     inetutils # inet tools
     inxi # CLI System Information Tool
+    joplin-desktop # Open source note taking and to-do application with synchronisation capabilities
+    joplin-cli # CLI client for Joplin
     killall # For Killing All Instances Of Programs
     libnotify # For Notifications
     libreoffice-qt6-fresh # Office
-    librewolf # Firefox Fork With Privacy In Mind
     lm_sensors # Used For Getting Hardware Temps
     lolcat # Add Colors To Your Terminal Command Output
     lshw # Detailed Hardware Information
     mpv # Incredible Video Player
     ncdu # Disk Usage Analyzer With Ncurses Interface
     nixfmt # Nix Formatter
-    obsidian # # powerfull notes
+    nmap # Utility for network discovery and security auditing
+    obsidian # powerful notes
     onefetch # provides os build info on current system
     openssl
     openvpn
@@ -55,8 +56,8 @@
     picard # For Changing Music Metadata & Getting Cover Art
     pkg-config # Wrapper Script For Allowing Packages To Get Info On Others
     playerctl # Allows Changing Media Volume Through Scripts
-    # protonvpn-gui
-    qalculate-qt # powerfull calculator
+    powertop # Power consumption diagnostics & tunables
+    qalculate-qt # powerful calculator
     qbittorrent # torrent client
     ripgrep # Improved Grep
     socat # Needed For Screenshots
@@ -69,5 +70,6 @@
     wget # Tool For Fetching Files With Links
     zathura # document reader
     zoom-us # video conferencing application
+    nvme-cli # NVMe drive management and firmware updates
   ];
 }

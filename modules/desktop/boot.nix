@@ -7,13 +7,12 @@
     kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = ["v4l2loopback"];
     extraModulePackages = [config.boot.kernelPackages.v4l2loopback];
-    # Отключаем проблемный UCSI драйвер (PPM init timeout на ASUS FA507NV)
-    blacklistedKernelModules = ["ucsi_acpi"];
     kernel.sysctl = {
       "vm.max_map_count" = 2147483642;
       "net.ipv4.ip_forward" = "1";
     };
     loader.systemd-boot.enable = true;
+    loader.systemd-boot.memtest86.enable = true;
     loader.efi.canTouchEfiVariables = true;
     # Appimage Support
     binfmt.registrations.appimage = {

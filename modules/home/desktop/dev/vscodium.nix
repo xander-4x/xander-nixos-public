@@ -1,12 +1,10 @@
 {
-  config,
   pkgs,
   lib,
   ...
 }: {
-  programs.vscode = {
+  programs.vscodium = {
     enable = true;
-    package = pkgs.vscodium;
     profiles.default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;

@@ -1,10 +1,10 @@
-{host, ...}: let
+{host, lib, ...}: let
   inherit
     (import ../../../../hosts/${host}/variables.nix)
     extraMonitorSettings
-    nvidiaDRM
-    amdDRM
     shellChoice
+    cursorName
+    cursorSize
     ;
 in {
   wayland.windowManager.hyprland = {
@@ -42,7 +42,7 @@ in {
         "match:class ^([Ww]aypaper)$, float on"
         "match:class ^(pavucontrol|org.pulseaudio.pavucontrol|com.saivert.pwvucontrol)$, center on"
         "match:class ^(nm-connection-editor|blueman-manager|.blueman-manager-wrapped)$, center on"
-        "match:class ([Tt]hunar) match:title ^(?!.*[Tt]hunar).*$, center on"
+        "match:class ([Tt]hunar), center on"
         "match:title ^(Authentication Required)$, center on"
         "match:class ^(.*)$, idle_inhibit fullscreen"
         "match:tag settings, float on"
@@ -52,10 +52,14 @@ in {
         "match:title ^(Picture-in-Picture)$, float on"
         "match:class ^(mpv|com.github.rafostar.Clapper)$, float on"
         "match:title ^(Authentication Required)$, float on"
-        "match:class (codium|codium-url-handler|VSCodium) match:title ^(?!.*(codium|VSCodium)).*$, float on"
-        "match:class ^(com.heroicgameslauncher.hgl)$ match:title ^(?!Heroic Games Launcher).*$, float on"
-        "match:class ^([Ss]team)$ match:title ^(?![Ss]team$).*$, float on"
-        "match:class ([Tt]hunar) match:title ^(?!.*[Tt]hunar).*$, float on"
+        "match:class (codium|codium-url-handler|VSCodium), float on"
+        "match:class (codium|codium-url-handler|VSCodium), match:title .*(codium|VSCodium).*, tile on"
+        "match:class ^(com.heroicgameslauncher.hgl)$, float on"
+        "match:class ^(com.heroicgameslauncher.hgl)$, match:title Heroic Games Launcher, tile on"
+        "match:class ^([Ss]team)$, float on"
+        "match:class ^([Ss]team)$, match:title ^[Ss]team$, tile on"
+        "match:class ([Tt]hunar), float on"
+        "match:class ([Tt]hunar), match:title .*[Tt]hunar.*, tile on"
         "match:initial_title (Add Folder to Workspace), float on"
         "match:initial_title (Open Files), float on"
         "match:initial_title (wants to save), float on"
@@ -95,10 +99,12 @@ in {
         "QT_AUTO_SCREEN_SCALE_FACTOR, 1"
         "SDL_VIDEODRIVER, x11"
         "MOZ_ENABLE_WAYLAND, 1"
-        "AQ_DRM_DEVICES,${amdDRM}:${nvidiaDRM}"
         "GDK_SCALE,1"
         "QT_SCALE_FACTOR,1"
         "EDITOR,nvim"
+      ] ++ lib.optionals (shellChoice == "dms") [
+        "XCURSOR_THEME,${cursorName}"
+        "XCURSOR_SIZE,${toString cursorSize}"
       ];
     };
     # Monitor settings: use DMS outputs.conf or manual settings

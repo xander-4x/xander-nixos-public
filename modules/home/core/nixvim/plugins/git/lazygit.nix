@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+  extraPackages = [ pkgs.lazygit ];
+
   extraPlugins = with pkgs.vimPlugins; [
     lazygit-nvim
   ];

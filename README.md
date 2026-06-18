@@ -13,14 +13,15 @@ A modular NixOS configuration with clear separation between core system modules,
 - **Stylix** - Automatic system-wide theming based on wallpaper
 - **Home Manager** - Declarative user environment management
 - **NixVim** - Fully configured Neovim with LSP, completion, and plugins
-- **Dual GPU support** - NVIDIA Prime with AMD/Intel
+- **Steam Deck support** - Jovian-NixOS Gaming Mode + minimal Plasma 6 Desktop Mode
 
 ## Hosts
 
-| Host | Type | Description |
-|------|------|-------------|
-| `desktop` | Desktop | Laptop with AMD+NVIDIA GPUs |
-| `server` | Server | Headless server with AMD CPU |
+| Host              | Type       | Description                                             |
+| ----------------- | ---------- | ------------------------------------------------------- |
+| `desktop`   | Desktop    | Laptop / desktop workstation                        |
+| `server`    | Server     | Headless server                                     |
+| `steamdeck` | Steam Deck | Jovian-NixOS — Gaming Mode + Plasma 6 Desktop Mode  |
 
 ## Project Structure
 
@@ -30,20 +31,32 @@ A modular NixOS configuration with clear separation between core system modules,
 ├── wallpapers/               # Wallpapers for Stylix theming
 │
 ├── hosts/
-│   ├── desktop/              # Desktop workstation
+│   ├── desktop/              # Desktop / laptop workstation
 │   │   ├── default.nix       # Host configuration (imports modules)
 │   │   ├── hardware.nix      # Hardware-specific settings
 │   │   ├── variables.nix     # Host variables (customize here!)
 │   │   ├── user.nix          # User & home-manager setup
 │   │   ├── host-packages.nix # System packages
+│   │   ├── kernel-tuning.nix # i915 / iommu kernel params
+│   │   ├── thinkpad.nix      # ThinkPad power management (TLP, battery limit, thermald)
+│   │   ├── hibernate.nix     # LUKS+Btrfs swapfile hibernation, suspend-then-hibernate on lid close
 │   │   └── zram.nix          # Swap configuration
 │   │
-│   └── server/               # Server
+│   ├── server/               # Server (headless)
+│   │   ├── default.nix       # Host configuration
+│   │   ├── hardware.nix      # Hardware-specific settings
+│   │   ├── variables.nix     # Host variables
+│   │   ├── user.nix          # User & home-manager setup
+│   │   ├── host-packages.nix # System packages
+│   │   └── zram.nix          # Swap configuration
+│   │
+│   └── steamdeck/            # Steam Deck (Jovian-NixOS)
 │       ├── default.nix       # Host configuration
 │       ├── hardware.nix      # Hardware-specific settings
 │       ├── variables.nix     # Host variables
 │       ├── user.nix          # User & home-manager setup
 │       ├── host-packages.nix # System packages
+│       ├── plasma-session.nix# Plasma 6 Desktop Mode session
 │       └── zram.nix          # Swap configuration
 │
 └── modules/
@@ -73,7 +86,7 @@ A modular NixOS configuration with clear separation between core system modules,
     │   ├── network.nix       # Minimal network (DHCP, SSH only)
     │   └── services.nix      # SSH hardening, fstrim, tailscale
     │
-    ├── gaming/               # Gaming (Steam, Lutris, OBS)
+    ├── gaming/               # Gaming (Steam, Lutris, Jovian Steam Deck stack)
     │
     ├── virtualisation/       # Container and VM support
     │   ├── podman.nix        # Podman + Docker compat (server & desktop)
@@ -97,6 +110,183 @@ A modular NixOS configuration with clear separation between core system modules,
             ├── dev/          # Development tools (VSCodium, cloud-tools)
             └── ...
 ```
+
+## NixVim
+
+Fully declarative Neovim configuration managed via [NixVim](https://github.com/nix-community/nixvim). Located in `modules/home/core/nixvim/`.
+
+### LSP Servers
+
+| Server                            | Language                                                               |
+| --------------------------------- | ---------------------------------------------------------------------- |
+| `lua_ls`                          | Lua                                                                    |
+| `nil_ls`                          | Nix                                                                    |
+| `typescript-tools`                | TypeScript / JavaScript                                                |
+| `pyright`                         | Python                                                                 |
+| `gopls`                           | Go                                                                     |
+| `html`                            | HTML                                                                   |
+| `jsonls`                          | JSON                                                                   |
+| `yamlls`                          | YAML (schemas: Kubernetes, GitHub Actions, Helm, Docker Compose, Argo) |
+| `terraformls`                     | Terraform                                                              |
+| `helm_ls`                         | Helm (uses yamlls internally)                                          |
+| `dockerls`                        | Dockerfile                                                             |
+| `docker_compose_language_service` | Docker Compose                                                         |
+| `marksman`                        | Markdown                                                               |
+| `nginx_language_server`           | Nginx                                                                  |
+
+### Plugins
+
+| Category       | Plugin                | Description                         |
+| -------------- | --------------------- | ----------------------------------- |
+| **Completion** | nvim-cmp              | Completion engine                   |
+|                | copilot-cmp           | — removed                           |
+|                | luasnip               | Snippet engine                      |
+|                | lspkind               | VS Code-style completion icons      |
+|                | nvim-autopairs        | Auto-close brackets                 |
+|                | schemastore           | JSON/YAML schema catalog            |
+| **LSP**        | nvim-lspconfig        | LSP client configuration            |
+|                | lsp-lines             | Inline diagnostic rendering         |
+|                | lsp-format            | Format on save via LSP              |
+|                | conform.nvim          | Formatter (prettier, black, gofmt…) |
+|                | fidget.nvim           | LSP progress notifications          |
+| **Debug**      | nvim-dap              | Debug Adapter Protocol core         |
+|                | nvim-dap-ui           | Debug UI panels                     |
+|                | nvim-dap-virtual-text | Variable values inline              |
+|                | nvim-dap-go           | Go debug adapter (delve)            |
+|                | nvim-dap-python       | Python debug adapter                |
+| **Editor**     | nvim-treesitter       | Syntax highlighting & indentation   |
+|                | neo-tree              | File explorer sidebar               |
+|                | undotree              | Visual undo history                 |
+|                | illuminate            | Highlight word under cursor         |
+|                | indent-blankline      | Indent guides                       |
+|                | todo-comments         | Highlight TODO/FIXME/NOTE           |
+|                | rainbow-delimiters    | Coloured bracket pairs              |
+|                | navic                 | LSP breadcrumbs in statusline       |
+| **Git**        | lazygit.nvim          | Full Git TUI inside Neovim          |
+|                | gitsigns.nvim         | Git signs in gutter                 |
+|                | diffview.nvim         | Git diff viewer & merge tool        |
+| **UI**         | bufferline.nvim       | Tab bar                             |
+|                | lualine.nvim          | Statusline                          |
+|                | startup.nvim          | Dashboard                           |
+|                | trouble.nvim          | Diagnostics list panel              |
+|                | which-key.nvim        | Keybinding hints                    |
+|                | web-devicons          | File type icons                     |
+| **Utils**      | telescope.nvim        | Fuzzy finder                        |
+|                | grug-far.nvim         | Project-wide search & replace       |
+|                | kulala.nvim           | HTTP client (`.http` files)         |
+|                | vim-dadbod + UI       | SQL database client                 |
+|                | mini.nvim             | surround, comment, indentscope      |
+|                | toggleterm.nvim       | Floating terminal                   |
+|                | markdown-preview.nvim | Live markdown preview in browser    |
+|                | obsidian.nvim         | Obsidian vault integration          |
+
+### Keybindings
+
+> Leader key: `Space`
+
+#### General
+
+| Key                        | Action                     |
+| -------------------------- | -------------------------- |
+| `<C-s>`                    | Save file                  |
+| `<C-/>`                    | Toggle comment             |
+| `<A-j/k>`                  | Move line up/down          |
+| `<C-h/j/k/l>`              | Navigate windows           |
+| `<leader>-` / `<leader>\|` | Split window below / right |
+| `<leader>qq`               | Force quit                 |
+| `<leader>qw`               | Save and quit              |
+
+#### Files & Search
+
+| Key               | Action                     |
+| ----------------- | -------------------------- |
+| `<leader><space>` | Find files                 |
+| `<leader>/`       | Live grep                  |
+| `<C-p>`           | Git files                  |
+| `<leader>ff`      | Find files                 |
+| `<leader>fr`      | Find text                  |
+| `<leader>fg`      | Recent files               |
+| `<leader>fb`      | Buffers                    |
+| `<leader>fe`      | File browser               |
+| `<leader>sk`      | Search keymaps             |
+| `<leader>sh`      | Help pages                 |
+| `<leader>sr`      | Search & replace (GrugFar) |
+
+#### Code / LSP
+
+| Key          | Action                 |
+| ------------ | ---------------------- |
+| `gd`         | Go to definition       |
+| `gr`         | Go to references       |
+| `gD`         | Go to declaration      |
+| `gI`         | Go to implementation   |
+| `gT`         | Type definition        |
+| `K`          | Hover documentation    |
+| `<leader>cr` | Rename symbol          |
+| `<leader>cd` | Line diagnostics       |
+| `]d` / `[d`  | Next / prev diagnostic |
+| `]e` / `[e`  | Next / prev error      |
+| `]w` / `[w`  | Next / prev warning    |
+
+#### Diagnostics (Trouble)
+
+| Key          | Action                |
+| ------------ | --------------------- |
+| `<leader>xx` | Document diagnostics  |
+| `<leader>xX` | Workspace diagnostics |
+| `<leader>xs` | Symbols               |
+| `<leader>xq` | Quickfix list         |
+| `<leader>xl` | Location list         |
+
+#### Git
+
+| Key          | Action                      |
+| ------------ | --------------------------- |
+| `<leader>gg` | LazyGit                     |
+| `<leader>gc` | Commits (Telescope)         |
+| `<leader>gs` | Git status (Telescope)      |
+| `<leader>gd` | Open Diffview               |
+| `<leader>gh` | File history (current file) |
+| `<leader>gH` | File history (repo)         |
+| `<leader>gD` | Close Diffview              |
+
+#### Debug (DAP)
+
+| Key          | Action                 |
+| ------------ | ---------------------- |
+| `<F5>`       | Continue / Start       |
+| `<F10>`      | Step over              |
+| `<F11>`      | Step into              |
+| `<F12>`      | Step out               |
+| `<leader>db` | Toggle breakpoint      |
+| `<leader>dB` | Conditional breakpoint |
+| `<leader>du` | Toggle DAP UI          |
+| `<leader>dr` | Open REPL              |
+| `<leader>dl` | Run last               |
+| `<leader>dt` | Terminate              |
+
+#### HTTP / REST (Kulala)
+
+| Key          | Action                   |
+| ------------ | ------------------------ |
+| `<leader>rr` | Run request under cursor |
+| `<leader>ra` | Run all requests         |
+| `<leader>rn` | Next request             |
+| `<leader>rp` | Previous request         |
+| `<leader>rc` | Copy as cURL             |
+
+#### Database (Dadbod)
+
+| Key          | Action         |
+| ------------ | -------------- |
+| `<leader>Du` | Toggle DB UI   |
+| `<leader>Da` | Add connection |
+
+#### Markdown
+
+| Key          | Action                    |
+| ------------ | ------------------------- |
+| `<leader>mp` | Toggle preview in browser |
 
 ## Installation
 
@@ -273,7 +463,7 @@ sudo nixos-generate-config --show-hardware-config > hosts/myhost/hardware.nix
 
 ```nix
 nixosConfigurations = {
-  "myhost" = mkHost "myhost" "myuser";
+  "myhost" = mkHost "myhost" "nixuser";
 };
 ```
 
@@ -382,18 +572,18 @@ systemctl --user enable --now podman.socket
 
 ## Module Overview
 
-| Module | Type | Description |
-|--------|------|-------------|
-| `modules/core` | Shared | Base system: hostname, timezone, locale, nix settings, security |
-| `modules/desktop` | Desktop | Boot, network, hardware, services, audio, bluetooth, theming |
-| `modules/server` | Server | Minimal boot, network (SSH), services (fstrim, tailscale), zsh |
-| `modules/gaming` | Desktop | Steam, Lutris, game streaming |
-| `modules/virtualisation` | Desktop | Full: Podman + libvirt + virt-manager |
-| `modules/virtualisation/podman.nix` | Both | Podman with Docker compatibility (rootless) |
-| `modules/virtualisation/libvirt.nix` | Desktop | libvirtd, virt-manager, SPICE |
-| `modules/drivers` | Desktop | NVIDIA, AMD, Intel GPU drivers |
-| `modules/home/core` | Both | CLI tools: zsh, git, yazi, btop, starship, NixVim |
-| `modules/home/desktop` | Desktop | GUI: Hyprland, DMS or waybar/rofi/swaync, terminals, xdg |
+| Module                               | Type    | Description                                                      |
+| ------------------------------------ | ------- | ---------------------------------------------------------------- |
+| `modules/core`                       | Shared  | Base system: hostname, timezone, locale, nix settings, security  |
+| `modules/desktop`                    | Desktop | Boot, network, hardware, services, audio, bluetooth, theming     |
+| `modules/server`                     | Server  | Minimal boot, network (SSH), services (fstrim, tailscale), zsh   |
+| `modules/gaming`                     | Desktop | Steam, Lutris, game streaming; `jovian.nix` for Steam Deck stack |
+| `modules/virtualisation`             | Desktop | Full: Podman + libvirt + virt-manager                            |
+| `modules/virtualisation/podman.nix`  | Both    | Podman with Docker compatibility (rootless)                      |
+| `modules/virtualisation/libvirt.nix` | Desktop | libvirtd, virt-manager, SPICE                                    |
+| `modules/drivers`                    | Desktop | NVIDIA, AMD, Intel GPU drivers                                   |
+| `modules/home/core`                  | Both    | CLI tools: zsh, git, yazi, btop, starship, NixVim                |
+| `modules/home/desktop`               | Desktop | GUI: Hyprland, DMS or waybar/rofi/swaync, terminals, xdg         |
 
 ## Key Files to Customize
 
@@ -415,6 +605,9 @@ systemctl --user enable --now podman.socket
 | [stylix](https://github.com/danth/stylix)                     | System-wide theming            |
 | [nixvim](https://github.com/nix-community/nixvim)             | Neovim configuration framework |
 | [nvf](https://github.com/notashelf/nvf)                       | Alternative Neovim framework   |
+| [jovian](https://github.com/Jovian-Experiments/Jovian-NixOS)  | Steam Deck / Jovian-NixOS      |
+| [zen-browser](https://github.com/youwen5/zen-browser-flake)   | Zen Browser                    |
+| [flake-utils](https://github.com/numtide/flake-utils)         | Flake utilities                |
 | [dgop](https://github.com/AvengeMedia/dgop)                   | Custom package overlay         |
 
 ## License

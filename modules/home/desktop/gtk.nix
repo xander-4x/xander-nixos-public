@@ -4,10 +4,6 @@ let
 in {
   home.packages = lib.optionals (shellChoice == "dms") [
     pkgs.glib # for gsettings
-    # Cursor themes for DMS selection
-    pkgs.bibata-cursors
-    pkgs.catppuccin-cursors.mochaDark
-    pkgs.adwaita-icon-theme # includes Adwaita cursor
   ];
 
   # Set GTK theme via dconf for Wayland apps

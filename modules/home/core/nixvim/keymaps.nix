@@ -326,9 +326,17 @@
     {
       mode = "n";
       key = "<leader>qq";
-      action = "<cmd>qa<cr>";
+      action = "<cmd>q!<cr>";
       options = {
-        desc = "Quit All";
+        desc = "Force Quit";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>qw";
+      action = "<cmd>wq<cr>";
+      options = {
+        desc = "Save and Quit";
       };
     }
     {
@@ -538,6 +546,36 @@
       options = {
         desc = "Unindent";
       };
+    }
+    {
+      mode = [
+        "n"
+        "v"
+      ];
+      key = "<ScrollWheelUp>";
+      action = "2<C-Y>";
+      options.silent = true;
+    }
+    {
+      mode = "i";
+      key = "<ScrollWheelUp>";
+      action = "<C-O>2<C-Y>";
+      options.silent = true;
+    }
+    {
+      mode = [
+        "n"
+        "v"
+      ];
+      key = "<ScrollWheelDown>";
+      action = "2<C-E>";
+      options.silent = true;
+    }
+    {
+      mode = "i";
+      key = "<ScrollWheelDown>";
+      action = "<C-O>2<C-E>";
+      options.silent = true;
     }
   ];
 }

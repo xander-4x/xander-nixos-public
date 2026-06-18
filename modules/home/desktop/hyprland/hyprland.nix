@@ -3,30 +3,33 @@
   config,
   pkgs,
   ...
-}: let
-  inherit
-    (import ../../../../hosts/${host}/variables.nix)
+}:
+let
+  inherit (import ../../../../hosts/${host}/variables.nix)
     keyboardLayout
     extraMonitorSettings
     shellChoice
     ;
 
   # Shell-specific startup commands (DMS uses systemd service instead)
-  shellExecOnce = if shellChoice == "dms" then [
-  ] else [
-    "killall -q waybar;sleep .5 && waybar"
-    "killall -q swaync;sleep .5 && swaync"
-  ];
-in {
+  shellExecOnce =
+    if shellChoice == "dms" then
+      [
+      ]
+    else
+      [
+      ];
+in
+{
   home.packages = with pkgs; [
-    swww
+    awww
     grim
     slurp
-    wl-clipboard
     swappy
     ydotool
     hyprpolkitagent
     hyprland-qtutils # needed for banners and ANR messages
+    hyprland-per-window-layout
   ];
   systemd.user.targets.hyprland-session.Unit.Wants = [
     "xdg-desktop-autostart.target"
@@ -37,27 +40,30 @@ in {
       source = ../../../../wallpapers;
       recursive = true;
     };
-    ".face.icon".source = ./avatar.png;
     ".config/avatar.png".source = ./avatar.png;
   };
   wayland.windowManager.hyprland = {
     enable = true;
+    configType = "hyprlang";
     package = pkgs.hyprland;
     systemd = {
       enable = true;
       enableXdgAutostart = true;
-      variables = ["--all"];
+      variables = [ "--all" ];
     };
     xwayland = {
       enable = true;
     };
 
     # Source DMS-generated configs (when using DMS)
-    extraConfig = if shellChoice == "dms" then ''
-      source = ~/.config/hypr/dms/colors.conf
-      source = ~/.config/hypr/dms/cursor.conf
-      source = ~/.config/hypr/dms/outputs.conf
-    '' else "";
+    extraConfig =
+      if shellChoice == "dms" then
+        ''
+          source = ~/.config/hypr/dms/colors.conf
+          source = ~/.config/hypr/dms/outputs.conf
+        ''
+      else
+        "";
 
     settings = {
       "$modifier" = "SUPER";
@@ -68,7 +74,9 @@ in {
         "systemctl --user start hyprpolkitagent"
         "nm-applet --indicator"
         "pypr &"
-      ] ++ shellExecOnce;
+        "hyprland-per-window-layout"
+      ]
+      ++ shellExecOnce;
 
       input = {
         kb_layout = "${keyboardLayout}";
@@ -79,8 +87,8 @@ in {
         repeat_delay = 300;
         follow_mouse = 1;
         float_switch_override_focus = 0;
-        sensitivity = 0;
-        resolve_binds_by_sym = true;  # Помогает с правильной обработкой клавиш
+        sensitivity = 0.2;
+        resolve_binds_by_sym = true;
         touchpad = {
           natural_scroll = true;
           disable_while_typing = true;
@@ -98,12 +106,19 @@ in {
         gaps_out = 8;
         border_size = 2;
         resize_on_border = true;
-      } // (if shellChoice == "dms" then {
-        # Border colors managed by DMS via colors.conf
-      } else {
-        "col.active_border" = "rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base0C}) 45deg";
-        "col.inactive_border" = "rgb(${config.lib.stylix.colors.base01})";
-      });
+      }
+      // (
+        if shellChoice == "dms" then
+          {
+            # Border colors managed by DMS via colors.conf
+          }
+        else
+          {
+            "col.active_border" =
+              "rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base0C}) 45deg";
+            "col.inactive_border" = "rgb(${config.lib.stylix.colors.base01})";
+          }
+      );
 
       misc = {
         layers_hog_keyboard_focus = true;
@@ -113,14 +128,12 @@ in {
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
         enable_swallow = false;
-        vfr = true; # Variable Frame Rate
-        vrr = 0; #Variable Refresh Rate  Set to 0 for NVIDIA/AQ_DRM_DEVICES
+        vrr = 0; # Variable Refresh Rate  Set to 0 for NVIDIA/AQ_DRM_DEVICES
         # Screen flashing to black momentarily or going black when app is fullscreen
         # Try setting vrr to 0
       };
 
       dwindle = {
-        pseudotile = true;
         preserve_split = true;
       };
 
@@ -157,4 +170,3 @@ in {
     };
   };
 }
-

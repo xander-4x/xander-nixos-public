@@ -18,6 +18,14 @@
     nvf.url = "github:notashelf/nvf";
     stylix.url = "github:danth/stylix";
     flake-utils.url = "github:numtide/flake-utils";
+    jovian = {
+      url = "github:Jovian-Experiments/Jovian-NixOS";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -44,6 +52,7 @@
     nixosConfigurations = {
       "desktop" = mkHost "desktop" "nixuser";
       "server" = mkHost "server" "nixuser";
+      "steamdeck" = mkHost "steamdeck" "nixuser";
     };
   };
 }

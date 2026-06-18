@@ -1,4 +1,5 @@
-{host, ...}: {
+{ host, ... }:
+{
   # Disable wait-online for faster boot (not needed for desktop)
   systemd.services.NetworkManager-wait-online.enable = false;
 
@@ -16,20 +17,15 @@
     tailscale.enable = true; # tailscale
     gnome.gnome-keyring.enable = true;
     upower.enable = true; # Battery monitoring for DMS/waybar widgets
+    accounts-daemon.enable = true; # AccountsService for DMS avatar persistence
 
     smartd = {
       enable = if host == "vm" then false else true;
       autodetect = true;
     };
 
-    # ASUS laptop services (can be disabled for servers)
-    supergfxd.enable = true;
-    asusd = {
-      enable = true;
-      enableUserService = true;
-    };
-
     hardware.bolt.enable = true;
+    fwupd.enable = true; # Firmware updates via LVFS
 
     udev.extraRules = ''
       # Ignore «touchpad» DualSense

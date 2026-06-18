@@ -39,8 +39,9 @@ in {
 
     # Environment variables - use AMD by default for power saving
     environment.variables = {
-      # AMD first for better battery life, NVIDIA second for external monitors
-      WLR_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card2";
+      # AMD only - Hyprland never touches dGPU so RTD3 can keep it in D3cold.
+      # Games still get NVIDIA via nvidia-offload (__NV_PRIME_RENDER_OFFLOAD).
+      WLR_DRM_DEVICES = "/dev/dri/card-amd";
 
       # Electron optimization for faster startup
       ELECTRON_OZONE_PLATFORM_HINT = "auto";

@@ -23,10 +23,16 @@
         nil_ls = {
           enable = true;
         };
-        ts_ls = {
+        marksman = {
           enable = true;
         };
-        marksman = {
+        nginx_language_server = {
+          enable = true;
+        };
+        dockerls = {
+          enable = true;
+        };
+        docker_compose_language_service = {
           enable = true;
         };
         pyright = {
@@ -138,17 +144,7 @@
   extraConfigLua = ''
     local _border = "rounded"
 
-    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-      vim.lsp.handlers.hover, {
-        border = _border
-      }
-    )
-
-    vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-      vim.lsp.handlers.signature_help, {
-        border = _border
-      }
-    )
+    vim.o.winborder = _border
 
     vim.diagnostic.config{
       float={border=_border}

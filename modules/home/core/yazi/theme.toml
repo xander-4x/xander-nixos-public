@@ -1,7 +1,3 @@
-# A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
-# If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/theme.json"
-
 
 [flavor]
 dark  = ""
@@ -28,7 +24,6 @@ marker_selected = { fg = "lightyellow", bg = "lightyellow" }
 # Tab
 tab_active   = { fg = "magenta", reversed = true }
 tab_inactive = {}
-tab_width    = 1
 
 # Count
 count_copied   = { fg = "white", bg = "green" }
@@ -58,11 +53,10 @@ unset_alt  = { fg = "red", bg = "gray" }
 
 [status]
 overall   = { bold = true }
-sep_left  = ["░▒▓","▓▒░"]
-sep_right = ["░▒▓","▓▒░"]
+sep_left  = { open = "░▒▓", close = "▓▒░" }
+sep_right = { open = "░▒▓", close = "▓▒░" }
 
 # Permissions
-perm_sep = { fg = "darkgray" }
 perm_type = { fg = "yellow" }
 perm_read = { fg = "green" }
 perm_write = { fg = "cyan" }
@@ -170,16 +164,16 @@ rules = [
 	# { mime = "inode/x-empty", fg = "red" },
 
 	# Special files
-	{ name = "*", is = "orphan", bg = "red" },
-	{ name = "*", is = "exec"  , fg = "green" },
+	{ url = "*", is = "orphan", bg = "red" },
+	{ url = "*", is = "exec"  , fg = "green" },
 
 	# Dummy files
-	{ name = "*", is = "dummy", bg = "red" },
-	{ name = "*/", is = "dummy", bg = "red" },
+	{ url = "*", is = "dummy", bg = "red" },
+	{ url = "*/", is = "dummy", bg = "red" },
 
 	# Fallback
-	# { name = "*", fg = "white" },
-	{ name = "*/", fg = "blue" }
+	# { url = "*", fg = "white" },
+	{ url = "*/", fg = "blue" }
 ]
 
 

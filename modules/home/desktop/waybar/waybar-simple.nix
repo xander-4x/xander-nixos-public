@@ -242,7 +242,7 @@ in
           #pulseaudio, #cpu, #memory, #idle_inhibitor {
             padding: 0px 10px;
             background: #${config.lib.stylix.colors.base04};
-            color: #${config.lib.stylix.colors.base00};
+            color: #${config.lib.stylix.colors.base05};
           }
           #custom-startmenu {
             color: #${config.lib.stylix.colors.base02};
@@ -258,7 +258,7 @@ in
           }
           #tray {
             background: #${config.lib.stylix.colors.base02};
-            color: #${config.lib.stylix.colors.base00};
+            color: #${config.lib.stylix.colors.base05};
             padding: 0px 10px;
           }
           #clock {
